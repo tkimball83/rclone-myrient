@@ -4,6 +4,11 @@
 
 A yaml controlled bash script to sync roms from myrient via rclone with custom filters
 
+## Requirements
+
+* [rclone](https://github.com/rclone/rclone)
+* [shyaml](https://github.com/0k/shyaml)
+
 ## Usage
 
     bash rclone-myrient.sh [options]
