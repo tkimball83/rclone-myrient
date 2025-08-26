@@ -2,40 +2,54 @@
 #
 # USAGE: rclone-myrient.sh [options]
 #
-# shellcheck disable=SC2065,SC2220
+# shellcheck disable=SC2220
 
-function get_kv () {
+function debug () {
+  builtin echo '[*]:' "$@"
+}
+
+function get_length () {
   local key="${1}"
-  local type=$("${RCLONE_SHYAML}" get-type "${key}" < "${RCLONE_YAML}")
+  local length
+
+  length=$("${RCLONE_SHYAML}" get-length "${key}" < "${RCLONE_YAML}" 2>/dev/null)
+  echo "${length}"
+}
+
+function get_value () {
+  local key="${1}"
+  local query
+  local type
+  local value
+
+  type=$("${RCLONE_SHYAML}" get-type "${key}" < "${RCLONE_YAML}" 2>/dev/null)
 
   if [[ "${type}" == 'str' ]]
   then
-    value=$("${RCLONE_SHYAML}" get-value "${key}" < "${RCLONE_YAML}")
+    query=get-value
+  elif [[ "${type}" == 'sequence' ]]
+  then
+    query=get-values
   else
-    value=$("${RCLONE_SHYAML}" get-values "${key}" < "${RCLONE_YAML}" | tr '\n' ' ')
+    query=
+  fi
+
+  if [[ -z "${query}" ]]
+  then
+    value=
+  else
+    value=$("${RCLONE_SHYAML}" "${query}" "${key}" < "${RCLONE_YAML}" | tr '\n' ' ' 2>/dev/null)
   fi
 
   echo "${value}"
 }
 
-function validate_opt () {
-  local opt="${1}"
-
-  [[ ! -f "${opt}" ]] && return 1 || return 0
-}
-
-function validate_kv () {
-  local key="${1}"
-  local value=$("${RCLONE_SHYAML}" get-value "${key}" < "${RCLONE_YAML}" 2>/dev/null)
-
-  [[ -z "${value}" ]] && return 1 || return 0
-}
-
-while getopts "b:c:f:s:t:" opt
+while getopts "b:c:df:s:t:" opt
 do
   case $opt in
     b) rclone_bin=$OPTARG ;;
     c) rclone_config=$OPTARG ;;
+    d) rclone_debug=true ;;
     f) rclone_yaml=$OPTARG ;;
     s) rclone_shyaml=$OPTARG ;;
     t) rclone_transfer=$OPTARG ;;
@@ -48,17 +62,17 @@ RCLONE_SHYAML=${rclone_shyaml-/usr/bin/shyaml}
 RCLONE_TRANSFER=${rclone_transfer-copy}
 RCLONE_YAML=${rclone_yaml-rclone-myrient.yaml}
 
-for opt in ${RCLONE_BIN} ${RCLONE_CONFIG} ${RCLONE_SHYAML} ${RCLONE_YAML}
+for opt in ${RCLONE_BIN} ${RCLONE_CONFIG} \
+           ${RCLONE_SHYAML} ${RCLONE_YAML}
 do
-  validate_opt "${opt}"
-  if [[ $? -eq 1 ]]
+  if [[ ! -f "${opt}" ]]
   then
     echo "ERROR: Unable to locate ${opt}, exiting."
     exit 1
   fi
 done
 
-yaml_length=$("${RCLONE_SHYAML}" get-length rclone_myrient < "${RCLONE_YAML}" 2>/dev/null)
+yaml_length=$(get_length rclone_myrient)
 
 if [[ -z "${yaml_length}" ]] || [[ ! "${yaml_length}" -gt 0 ]]
 then
@@ -68,37 +82,40 @@ fi
 
 for i in $(seq 0 $((yaml_length - 1)))
 do
+
+  declare -A map
   for key in name destination options sources
   do
-    validate_kv "rclone_myrient.${i}.${key}"
-    if [[ $? -eq 1 ]]
+    map[${key}]=$(get_value "rclone_myrient.${i}.${key}")
+    if [[ -z "${map[${key}]}" ]]
     then
       echo "ERROR: Missing key/value pair rclone_myrient.${i}.${key}, skipping."
       continue 2
     fi
   done
 
-  declare -A map
-  for key in name destination options
+  if [[ -f "filters/${map['name']}.filter" ]]
+  then
+    filter_from="${map['name']}.filter"
+  else
+    filter_from="all.filter"
+  fi
+
+  map['sources']=$(get_length "rclone_myrient.${i}.sources")
+
+  for s in $(seq 0 $((map['sources'] - 1)))
   do
-    map[${key}]=$(get_kv "rclone_myrient.${i}.${key}")
-  done
+    map['source']=$(get_value "rclone_myrient.${i}.sources.${s}")
 
-  [[ -f "filters/${name}.filter" ]] && filter_from="${name}.filter" || filter_from="all.filter"
-
-  sources=$("${RCLONE_SHYAML}" get-length "rclone_myrient.${i}.sources" < "${RCLONE_YAML}")
-
-  for s in $(seq 0 $((sources - 1)))
-  do
-    [[ "${s}" -eq 0 ]] && echo
-
-    source=$(get_kv "rclone_myrient.${i}.sources.${s}")
-
-    echo "SOURCE      -> ${source}"
-    echo "DESTINATION -> ${map['destination']}"
-    echo "FILTER FROM -> ${filter_from}"
-    echo "OPTIONS     -> ${map['options']}"
-    echo
+    if [[ "${rclone_debug}" = true ]]
+    then
+      [[ "${s}" == 0 ]] && echo
+      debug "SOURCE      -> ${map['source']}"
+      debug "DESTINATION -> ${map['destination']}"
+      debug "FILTER FROM -> ${filter_from}"
+      debug "OPTIONS     -> ${map['options']}"
+      echo
+    fi
 
     "${RCLONE_BIN}" mkdir "${map['destination']}"
 
@@ -107,7 +124,7 @@ do
       --config "${RCLONE_CONFIG}" \
       --filter-from "filters/${filter_from}" \
       ${map['options']} \
-      "${source}" \
+      "${map['source']}" \
       "${map['destination']}"
 
   done
