@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# USAGE: rclone-myrient.sh [options]
+#
 # shellcheck disable=SC2065,SC2220
 
 function echo () {
@@ -21,14 +23,15 @@ RCLONE_BIN=${rclone_bin-/usr/bin/rclone}
 RCLONE_CONFIG=${rclone_config-rclone-myrient.conf}
 RCLONE_SHYAML=${rclone_shyaml-/usr/bin/shyaml}
 RCLONE_TRANSFER=${rclone_transfer-copy}
-RCLONE_YAML=${rclone_yaml-$(pwd)/rclone-myrient.yaml}
+RCLONE_YAML=${rclone_yaml-rclone-myrient.yaml}
 
-for test in ${RCLONE_BIN} \
-            ${RCLONE_CONFIG} \
-            ${RCLONE_SHYAML} \
-            ${RCLONE_YAML}
+for rclone_myrient_opt in \
+  ${RCLONE_BIN} \
+  ${RCLONE_CONFIG} \
+  ${RCLONE_SHYAML} \
+  ${RCLONE_YAML}
 do
-  if [[ ! -f "${test}" ]]
+  if [[ ! -f "${rclone_myrient_opt}" ]]
   then
     echo "ERROR: Unable to locate ${test}, exiting."
     exit 1
@@ -37,15 +40,9 @@ done
 
 rclone_myrient_len=$("${RCLONE_SHYAML}" get-length rclone_myrient < "${RCLONE_YAML}" 2>/dev/null)
 
-if [[ -z "${rclone_myrient_len}" ]]
+if [[ -z "${rclone_myrient_len}" ]] || [[ ! "${rclone_myrient_len}" -gt 0 ]]
 then
   echo "ERROR: The rclone myrient list is empty, exiting."
-  exit 1
-fi
-
-if [[ ! "${rclone_myrient_len}" -gt 0 ]]
-then
-  echo "ERROR: The rclone myrient list has zero elements, exiting."
   exit 1
 fi
 
@@ -53,10 +50,11 @@ for i in $(seq 0 $((rclone_myrient_len - 1)))
 do
 
   rclone_myrient_continue=0
-  for gv in name \
-            destination \
-            options \
-            sources
+  for gv in \
+    name \
+    destination \
+    options \
+    sources
   do
     rclone_myrient_element=$("${RCLONE_SHYAML}" get-value "rclone_myrient.${i}.${gv}" < "${RCLONE_YAML}" 2>/dev/null)
     if [[ -z "${rclone_myrient_element}" ]]
@@ -77,9 +75,10 @@ do
   for s in $(seq 0 $((sources - 1)))
   do
 
+    [[ "${s}" -eq 0 ]] && builtin echo
+
     source=$("${RCLONE_SHYAML}" get-value "rclone_myrient.${i}.sources.${s}" < "${RCLONE_YAML}")
 
-    builtin echo
     echo "SOURCE      -> ${source}"
     echo "DESTINATION -> ${destination}"
     echo "FILTER FROM -> ${filter_from}"
