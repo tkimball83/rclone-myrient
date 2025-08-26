@@ -129,7 +129,7 @@ rclone_myrient:
       - --transfers 16
 
   - name: xbox360
-    destination: roms/xbox
+    destination: roms/xbox360
     sources:
       - myrient-http:/files/Redump/Microsoft - Xbox 360
     options:
