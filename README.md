@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-GPLv3-brightgreen.svg?style=flat)](COPYING)
 
-A yaml controlled bash script to sync roms from myrient via rclone with custom filters
+A yaml controlled bash script to copy roms from myrient via rclone with custom filters
 
 ## Requirements
 
