@@ -4,8 +4,31 @@
 #
 # shellcheck disable=SC2065,SC2220
 
-function echo () {
-  builtin echo '[*]:' "$@"
+function get_kv () {
+  local key="${1}"
+  local type=$("${RCLONE_SHYAML}" get-type "${key}" < "${RCLONE_YAML}")
+
+  if [[ "${type}" == 'str' ]]
+  then
+    value=$("${RCLONE_SHYAML}" get-value "${key}" < "${RCLONE_YAML}")
+  else
+    value=$("${RCLONE_SHYAML}" get-values "${key}" < "${RCLONE_YAML}" | tr '\n' ' ')
+  fi
+
+  echo "${value}"
+}
+
+function validate_opt () {
+  local opt="${1}"
+
+  [[ ! -f "${opt}" ]] && return 1 || return 0
+}
+
+function validate_kv () {
+  local key="${1}"
+  local value=$("${RCLONE_SHYAML}" get-value "${key}" < "${RCLONE_YAML}" 2>/dev/null)
+
+  [[ -z "${value}" ]] && return 1 || return 0
 }
 
 while getopts "b:c:f:s:t:" opt
@@ -25,75 +48,66 @@ RCLONE_SHYAML=${rclone_shyaml-/usr/bin/shyaml}
 RCLONE_TRANSFER=${rclone_transfer-copy}
 RCLONE_YAML=${rclone_yaml-rclone-myrient.yaml}
 
-for rclone_myrient_opt in \
-  ${RCLONE_BIN} \
-  ${RCLONE_CONFIG} \
-  ${RCLONE_SHYAML} \
-  ${RCLONE_YAML}
+for opt in ${RCLONE_BIN} ${RCLONE_CONFIG} ${RCLONE_SHYAML} ${RCLONE_YAML}
 do
-  if [[ ! -f "${rclone_myrient_opt}" ]]
+  validate_opt "${opt}"
+  if [[ $? -eq 1 ]]
   then
-    echo "ERROR: Unable to locate ${test}, exiting."
+    echo "ERROR: Unable to locate ${opt}, exiting."
     exit 1
   fi
 done
 
-rclone_myrient_len=$("${RCLONE_SHYAML}" get-length rclone_myrient < "${RCLONE_YAML}" 2>/dev/null)
+yaml_length=$("${RCLONE_SHYAML}" get-length rclone_myrient < "${RCLONE_YAML}" 2>/dev/null)
 
-if [[ -z "${rclone_myrient_len}" ]] || [[ ! "${rclone_myrient_len}" -gt 0 ]]
+if [[ -z "${yaml_length}" ]] || [[ ! "${yaml_length}" -gt 0 ]]
 then
   echo "ERROR: The rclone myrient list is empty, exiting."
   exit 1
 fi
 
-for i in $(seq 0 $((rclone_myrient_len - 1)))
+for i in $(seq 0 $((yaml_length - 1)))
 do
-
-  rclone_myrient_continue=0
-  for gv in \
-    name \
-    destination \
-    options \
-    sources
+  for key in name destination options sources
   do
-    rclone_myrient_element=$("${RCLONE_SHYAML}" get-value "rclone_myrient.${i}.${gv}" < "${RCLONE_YAML}" 2>/dev/null)
-    if [[ -z "${rclone_myrient_element}" ]]
+    validate_kv "rclone_myrient.${i}.${key}"
+    if [[ $? -eq 1 ]]
     then
-      echo "WARNING: Missing key/value pair rclone_myrient.${i}.${gv}, skipping."
-      rclone_myrient_continue=$((rclone_myrient_continue + 1))
+      echo "ERROR: Missing key/value pair rclone_myrient.${i}.${key}, skipping."
+      continue 2
     fi
   done
-  [[ "${rclone_myrient_continue}" -gt 0 ]] && continue
 
-  name=$("${RCLONE_SHYAML}" get-value "rclone_myrient.${i}.name" < "${RCLONE_YAML}")
-  destination=$("${RCLONE_SHYAML}" get-value "rclone_myrient.${i}.destination" < "${RCLONE_YAML}")
-  options=$("${RCLONE_SHYAML}" get-values "rclone_myrient.${i}.options" < "${RCLONE_YAML}" | tr '\n' ' ')
+  declare -A map
+  for key in name destination options
+  do
+    map[${key}]=$(get_kv "rclone_myrient.${i}.${key}")
+  done
+
+  [[ -f "filters/${name}.filter" ]] && filter_from="${name}.filter" || filter_from="all.filter"
+
   sources=$("${RCLONE_SHYAML}" get-length "rclone_myrient.${i}.sources" < "${RCLONE_YAML}")
 
-  [[ -f "filters/${name}.filter" ]] && filter_from="filters/${name}.filter" || filter_from="filters/all.filter"
-
+  echo
   for s in $(seq 0 $((sources - 1)))
   do
-
-    [[ "${s}" -eq 0 ]] && builtin echo
-
     source=$("${RCLONE_SHYAML}" get-value "rclone_myrient.${i}.sources.${s}" < "${RCLONE_YAML}")
 
     echo "SOURCE      -> ${source}"
-    echo "DESTINATION -> ${destination}"
+    echo "DESTINATION -> ${map['destination']}"
     echo "FILTER FROM -> ${filter_from}"
-    echo "OPTIONS     -> ${options}"
+    echo "OPTIONS     -> ${map['options']}"
     builtin echo
 
-    "${RCLONE_BIN}" mkdir "${destination}"
+    "${RCLONE_BIN}" mkdir "${map['destination']}"
 
     # shellcheck disable=SC2086
     "${RCLONE_BIN}" "${RCLONE_TRANSFER}" \
       --config "${RCLONE_CONFIG}" \
-      --filter-from "${filter_from}" \
-      ${options} \
+      --filter-from "filters/${filter_from}" \
+      ${map['options']} \
       "${source}" \
-      "${destination}"
+      "${map['destination']}"
 
   done
 done
