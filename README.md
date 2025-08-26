@@ -10,14 +10,14 @@ A yaml controlled bash script to sync roms from myrient via rclone with custom f
 
 ## Options
 
-| Flag | Default                 | Description                         |
-| ---- | ----------------------- | ----------------------------------- |
-| -b   | /usr/bin/rclone         | Change path to rclone binary        |
-| -c   | /etc/rclone/rclone.conf | Change path to rclone config        |
-| -d   | false                   | Enable debugging output             |
-| -f   | rclone-myrient.yaml     | Change path to script config yaml   |
-| -s   | /usr/bin/shyaml         | Change path to shyaml binary        |
-| -t   | copy                    | Change rclone transfer mechanism    |
+| Flag | Default                   | Description                         |
+| ---- | ------------------------- | ----------------------------------- |
+| `-b` | `/usr/bin/rclone`         | Change path to rclone binary        |
+| `-c` | `/etc/rclone/rclone.conf` | Change path to rclone config        |
+| `-d` | `false`                   | Enable debugging output             |
+| `-f` | `rclone-myrient.yaml`     | Change path to script config yaml   |
+| `-s` | `/usr/bin/shyaml`         | Change path to shyaml binary        |
+| `-t` | `copy`                    | Change rclone transfer mechanism    |
 
 ## Examples
 
