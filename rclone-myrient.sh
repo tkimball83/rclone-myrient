@@ -4,30 +4,28 @@
 #
 # shellcheck disable=SC2220
 
-function debug () {
+function debug() {
   builtin echo '[*]:' "$@"
 }
 
-function get_length () {
+function get_length() {
   local key="${1}"
   local length
 
-  length=$("${RCLONE_SHYAML}" get-length "${key}" < "${RCLONE_YAML}" 2>/dev/null)
+  length=$("${RCLONE_SHYAML}" get-length "${key}" <"${RCLONE_YAML}" 2>/dev/null)
 
   echo "${length}"
 }
 
-function get_type () {
+function get_type() {
   local key="${1}"
   local type
 
-  type=$("${RCLONE_SHYAML}" get-type "${key}" < "${RCLONE_YAML}" 2>/dev/null)
+  type=$("${RCLONE_SHYAML}" get-type "${key}" <"${RCLONE_YAML}" 2>/dev/null)
 
-  if [[ "${type}" == 'str' ]]
-  then
+  if [[ "${type}" == 'str' ]]; then
     query=get-value
-  elif [[ "${type}" == 'sequence' ]]
-  then
+  elif [[ "${type}" == 'sequence' ]]; then
     query=get-values
   else
     query=
@@ -36,26 +34,23 @@ function get_type () {
   echo "${query}"
 }
 
-
-function get_value () {
+function get_value() {
   local key="${1}"
   local query
   local value
 
   query=$(get_type "${key}")
 
-  if [[ -z "${query}" ]]
-  then
+  if [[ -z "${query}" ]]; then
     value=
   else
-    value=$("${RCLONE_SHYAML}" "${query}" "${key}" < "${RCLONE_YAML}" | tr '\n' ' ' 2>/dev/null)
+    value=$("${RCLONE_SHYAML}" "${query}" "${key}" <"${RCLONE_YAML}" | tr '\n' ' ' 2>/dev/null)
   fi
 
   echo "${value}"
 }
 
-while getopts "b:c:df:s:t:" opt
-do
+while getopts "b:c:df:s:t:" opt; do
   case $opt in
     b) rclone_bin=$OPTARG ;;
     c) rclone_config=$OPTARG ;;
@@ -72,11 +67,8 @@ RCLONE_SHYAML=${rclone_shyaml-/usr/bin/shyaml}
 RCLONE_TRANSFER=${rclone_transfer-copy}
 RCLONE_YAML=${rclone_yaml-rclone-myrient.yaml}
 
-for opt in ${RCLONE_BIN} ${RCLONE_CONFIG} \
-           ${RCLONE_SHYAML} ${RCLONE_YAML}
-do
-  if [[ ! -f "${opt}" ]]
-  then
+for opt in ${RCLONE_BIN} ${RCLONE_CONFIG} ${RCLONE_SHYAML} ${RCLONE_YAML}; do
+  if [[ ! -f "${opt}" ]]; then
     echo "ERROR: Unable to locate ${opt}, exiting."
     exit 1
   fi
@@ -84,28 +76,23 @@ done
 
 yaml_length=$(get_length rclone_myrient)
 
-if [[ -z "${yaml_length}" ]] || [[ ! "${yaml_length}" -gt 0 ]]
-then
+if [[ -z "${yaml_length}" ]] || [[ ! "${yaml_length}" -gt 0 ]]; then
   echo "ERROR: The rclone myrient list is empty, exiting."
   exit 1
 fi
 
-for i in $(seq 0 $((yaml_length - 1)))
-do
+for i in $(seq 0 $((yaml_length - 1))); do
 
   declare -A map
-  for key in name destination options sources
-  do
+  for key in name destination options sources; do
     map[${key}]=$(get_value "rclone_myrient.${i}.${key}")
-    if [[ -z "${map[${key}]}" ]]
-    then
+    if [[ -z "${map[${key}]}" ]]; then
       echo "ERROR: Missing key/value pair rclone_myrient.${i}.${key}, skipping."
       continue 2
     fi
   done
 
-  if [[ -f "filters/${map['name']}.filter" ]]
-  then
+  if [[ -f "filters/${map['name']}.filter" ]]; then
     filter_from="${map['name']}.filter"
   else
     filter_from="all.filter"
@@ -113,12 +100,10 @@ do
 
   map['sources']=$(get_length "rclone_myrient.${i}.sources")
 
-  for s in $(seq 0 $((map['sources'] - 1)))
-  do
+  for s in $(seq 0 $((map['sources'] - 1))); do
     map['source']=$(get_value "rclone_myrient.${i}.sources.${s}")
 
-    if [[ "${rclone_debug}" = true ]]
-    then
+    if [[ "${rclone_debug}" = true ]]; then
       [[ "${s}" == 0 ]] && echo
       debug "SOURCE      -> ${map['source']}"
       debug "DESTINATION -> ${map['destination']}"
