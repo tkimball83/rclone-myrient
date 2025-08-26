@@ -13,14 +13,13 @@ function get_length () {
   local length
 
   length=$("${RCLONE_SHYAML}" get-length "${key}" < "${RCLONE_YAML}" 2>/dev/null)
+
   echo "${length}"
 }
 
-function get_value () {
+function get_type () {
   local key="${1}"
-  local query
   local type
-  local value
 
   type=$("${RCLONE_SHYAML}" get-type "${key}" < "${RCLONE_YAML}" 2>/dev/null)
 
@@ -33,6 +32,17 @@ function get_value () {
   else
     query=
   fi
+
+  echo "${query}"
+}
+
+
+function get_value () {
+  local key="${1}"
+  local query
+  local value
+
+  query=$(get_type "${key}")
 
   if [[ -z "${query}" ]]
   then
