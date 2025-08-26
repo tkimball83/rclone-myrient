@@ -88,10 +88,11 @@ do
 
   sources=$("${RCLONE_SHYAML}" get-length "rclone_myrient.${i}.sources" < "${RCLONE_YAML}")
 
-  echo
   for s in $(seq 0 $((sources - 1)))
   do
-    source=$("${RCLONE_SHYAML}" get-value "rclone_myrient.${i}.sources.${s}" < "${RCLONE_YAML}")
+    [[ "${s}" -eq 0 ]] && echo
+
+    source=$(get_kv "rclone_myrient.${i}.sources.${s}")
 
     echo "SOURCE      -> ${source}"
     echo "DESTINATION -> ${map['destination']}"
