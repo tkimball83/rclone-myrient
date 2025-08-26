@@ -19,6 +19,7 @@ function get_length() {
 
 function get_type() {
   local key="${1}"
+  local query
   local type
 
   type=$("${RCLONE_SHYAML}" get-type "${key}" <"${RCLONE_YAML}" 2>/dev/null)
@@ -93,9 +94,9 @@ for i in $(seq 0 $((yaml_length - 1))); do
   done
 
   if [[ -f "filters/${map['name']}.filter" ]]; then
-    filter_from="${map['name']}.filter"
+    map['filter_from']="${map['name']}.filter"
   else
-    filter_from="all.filter"
+    map['filter_from']="all.filter"
   fi
 
   map['sources']=$(get_length "rclone_myrient.${i}.sources")
@@ -104,11 +105,10 @@ for i in $(seq 0 $((yaml_length - 1))); do
     map['source']=$(get_value "rclone_myrient.${i}.sources.${s}")
 
     if [[ "${rclone_debug}" = true ]]; then
-      [[ "${s}" == 0 ]] && echo
-      debug "SOURCE      -> ${map['source']}"
-      debug "DESTINATION -> ${map['destination']}"
-      debug "FILTER FROM -> ${filter_from}"
-      debug "OPTIONS     -> ${map['options']}"
+      echo
+      for key in "${!map[@]}"; do
+        debug "${key^^} -> ${map[${key}]}"
+      done
       echo
     fi
 
@@ -117,7 +117,7 @@ for i in $(seq 0 $((yaml_length - 1))); do
     # shellcheck disable=SC2086
     "${RCLONE_BIN}" "${RCLONE_TRANSFER}" \
       --config "${RCLONE_CONFIG}" \
-      --filter-from "filters/${filter_from}" \
+      --filter-from "filters/${map['filter_from']}" \
       ${map['options']} \
       "${map['source']}" \
       "${map['destination']}"
