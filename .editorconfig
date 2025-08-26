@@ -1,4 +1,4 @@
-# .shfmtrc
+# .editorconfig
 
 [*.sh]
 indent_size = 2
