@@ -6,8 +6,10 @@ A yaml controlled bash script to sync roms from myrient via rclone with custom f
 
 ## Requirements
 
-* [rclone](https://github.com/rclone/rclone)
-* [shyaml](https://github.com/0k/shyaml)
+| Requirement                                | Description               |
+| ------------------------------------------ | ------------------------- |
+| [rclone](https://github.com/rclone/rclone) | rsync for cloud storage   |
+| [shyaml](https://github.com/0k/shyaml)     | YAML for the command line |
 
 ## Usage
 
