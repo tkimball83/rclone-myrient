@@ -1,0 +1,28 @@
+# psx.filter
+
+- /**BIOS**
+- /**(*{Alpha,Beta,Demo,Digital,Proto}*)**
+- /**(*{SECAM,PAL}*)**
++ *Crash Bandicoot*(*{USA,World}*)*
++ *Driver*(*{USA,World}*)*
++ *Final Fantasy*(*{USA,World}*)*
++ *Frogger*(*{USA,World}*)*
++ *Gran Turismo*(*{USA,World}*)*
++ *Harry Potter*(*{USA,World}*)*
++ *Metal Gear Solid*(*{USA,World}*)*
++ *Mortal Kombat*(*{USA,World}*)*
++ *Need for Speed*(*{USA,World}*)*
++ *Oddworld*(*{USA,World}*)*
++ *Rayman*(*{USA,World}*)*
++ *Resident Evil*(*{USA,World}*)*
++ *Ridge Racer*(*{USA,World}*)*
++ *Silent Hill*(*{USA,World}*)*
++ *Spider-Man*(*{USA,World}*)*
++ *Spyro*(*{USA,World}*)*
++ *Street Fighter*(*{USA,World}*)*
++ *Tekken*(*{USA,World}*)*
++ *Tomb Raider*(*{USA,World}*)*
++ *Tony Hawk*(*{USA,World}*)*
++ *Twisted Metal*(*{USA,World}*)*
++ *WWF*(*{USA,World}*)*
+- /**
