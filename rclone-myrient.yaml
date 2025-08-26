@@ -1,0 +1,100 @@
+---
+rclone_myrient:
+  - name: atari2600
+    destination: roms/atari2600
+    sources:
+      - myrient-http:/files/No-Intro/Atari - Atari 2600
+      - myrient-http:/files/No-Intro/Atari - Atari 2600 (Aftermarket)
+      - myrient-http:/files/No-Intro/Atari - Atari 2600 (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: gb
+    destination: roms/gb
+    sources:
+      - myrient-http:/files/No-Intro/Nintendo - Game Boy
+      - myrient-http:/files/No-Intro/Nintendo - Game Boy (Aftermarket)
+      - myrient-http:/files/No-Intro/Nintendo - Game Boy (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: gba
+    destination: roms/gba
+    sources:
+      - myrient-http:/files/No-Intro/Nintendo - Game Boy Advance
+      - myrient-http:/files/No-Intro/Nintendo - Game Boy Advance (Aftermarket)
+      - myrient-http:/files/No-Intro/Nintendo - Game Boy Advance (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: gbc
+    destination: roms/gbc
+    sources:
+      - myrient-http:/files/No-Intro/Nintendo - Game Boy Color
+      - myrient-http:/files/No-Intro/Nintendo - Game Boy Color (Aftermarket)
+      - myrient-http:/files/No-Intro/Nintendo - Game Boy Color (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: nds
+    destination: roms/nds
+    sources:
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo DS
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo DS (Aftermarket)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo DS (Private)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo DSi (Decrypted)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo DSi (Decrypted) (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: n64
+    destination: roms/n64
+    sources:
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo 64 (BigEndian)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo 64 (BigEndian) (Aftermarket)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo 64 (BigEndian) (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: snes
+    destination: roms/snes
+    sources:
+      - myrient-http:/files/No-Intro/Nintendo - Super Nintendo Entertainment System
+      - myrient-http:/files/No-Intro/Nintendo - Super Nintendo Entertainment System (Aftermarket)
+      - myrient-http:/files/No-Intro/Nintendo - Super Nintendo Entertainment System (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: xbox
+    destination: roms/xbox
+    sources:
+      - myrient-http:/files/Redump/Microsoft - Xbox
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: 3ds
+    destination: roms/3ds
+    sources:
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo 3DS (Decrypted)
+      - myrient-http:/files/No-Intro/Nintendo - New Nintendo 3DS (Decrypted)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+...

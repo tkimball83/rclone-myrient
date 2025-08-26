@@ -1,0 +1,7 @@
+# all.filter
+
+- /**BIOS**
+- /**(*{Alpha,Beta,Demo,Digital,Proto}*)**
+- /**(*{SECAM,PAL}*)**
++ /*(*{USA,World}*)*
+- /**
