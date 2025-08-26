@@ -11,6 +11,27 @@ rclone_myrient:
       - --multi-thread-streams 0
       - --transfers 16
 
+  - name: gamegear
+    destination: roms/gamegear
+    sources:
+      - myrient-http:/files/No-Intro/Sega - Game Gear
+      - myrient-http:/files/No-Intro/Sega - Game Gear (Aftermarket)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: genesis
+    destination: roms/genesis
+    sources:
+      - myrient-http:/files/No-Intro/Sega - Mega Drive - Genesis
+      - myrient-http:/files/No-Intro/Sega - Mega Drive - Genesis (Aftermarket)
+      - myrient-http:/files/No-Intro/Sega - Mega Drive - Genesis (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
   - name: gb
     destination: roms/gb
     sources:
@@ -47,11 +68,21 @@ rclone_myrient:
   - name: nds
     destination: roms/nds
     sources:
-      - myrient-http:/files/No-Intro/Nintendo - Nintendo DS
-      - myrient-http:/files/No-Intro/Nintendo - Nintendo DS (Aftermarket)
-      - myrient-http:/files/No-Intro/Nintendo - Nintendo DS (Private)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo DS (Decrypted)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo DS (Decrypted) (Aftermarket)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo DS (Decrypted) (Private)
       - myrient-http:/files/No-Intro/Nintendo - Nintendo DSi (Decrypted)
-      - myrient-http:/files/No-Intro/Nintendo - Nintendo DSi (Decrypted) (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: nes
+    destination: roms/nes
+    sources:
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo Entertainment System (Headered)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo Entertainment System (Headered) (Aftermarket)
+      - myrient-http:/files/No-Intro/Nintendo - Nintendo Entertainment System (Headered) (Private)
     options:
       - --checkers 32
       - --multi-thread-streams 0
@@ -63,6 +94,15 @@ rclone_myrient:
       - myrient-http:/files/No-Intro/Nintendo - Nintendo 64 (BigEndian)
       - myrient-http:/files/No-Intro/Nintendo - Nintendo 64 (BigEndian) (Aftermarket)
       - myrient-http:/files/No-Intro/Nintendo - Nintendo 64 (BigEndian) (Private)
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: psx
+    destination: roms/psx
+    sources:
+      - myrient-http:/files/Redump/Sony - PlayStation
     options:
       - --checkers 32
       - --multi-thread-streams 0
@@ -83,6 +123,15 @@ rclone_myrient:
     destination: roms/xbox
     sources:
       - myrient-http:/files/Redump/Microsoft - Xbox
+    options:
+      - --checkers 32
+      - --multi-thread-streams 0
+      - --transfers 16
+
+  - name: xbox360
+    destination: roms/xbox
+    sources:
+      - myrient-http:/files/Redump/Microsoft - Xbox 360
     options:
       - --checkers 32
       - --multi-thread-streams 0
