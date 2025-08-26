@@ -98,7 +98,7 @@ do
     echo "DESTINATION -> ${map['destination']}"
     echo "FILTER FROM -> ${filter_from}"
     echo "OPTIONS     -> ${map['options']}"
-    builtin echo
+    echo
 
     "${RCLONE_BIN}" mkdir "${map['destination']}"
 
