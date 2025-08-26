@@ -22,7 +22,8 @@ A yaml controlled bash script to sync roms from myrient via rclone with custom f
 ## Examples
 
     bash rclone-myrient.sh -d
-    bash rclone-myrient.sh -b ~/.local/bin/rclone -s /opt/homebrew/bin/shyaml  -d
+    bash rclone-myrient.sh -b ~/.local/bin/rclona -c ~/.config/rclone/rclone.conf
+    bash rclone-myrient.sh -s /opt/homebrew/bin/shyaml
 
 ## License
 
